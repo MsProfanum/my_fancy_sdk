@@ -18,8 +18,9 @@ pluginManagement {
 
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
-    id("com.android.application") version "8.7.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.8.22" apply false
+    //TODO: Change so that it's toml compatible - ${libs.versions.agp.get()}
+    id("com.android.application") version "8.7.2" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.10" apply false
 }
 
 include(":app")
