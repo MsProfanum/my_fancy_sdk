@@ -2,15 +2,16 @@ group = "com.example.my_fancy_sdk"
 version = "1.0-SNAPSHOT"
 
 buildscript {
-    ext.kotlin_version = "1.8.22"
+    ext.kotlin_version = "1.9.10"
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.7.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+        classpath("com.android.tools.build:gradle:${libs.versions.agp.get()}")
+        classpath(libs.kotlin.gradlePlugin)
+        classpath(libs.ksp.gradlePlugin)
     }
 }
 
