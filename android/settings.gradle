@@ -1,1 +1,3 @@
 rootProject.name = 'my_fancy_sdk'
+
+include ':runtime-aware-sdk'
