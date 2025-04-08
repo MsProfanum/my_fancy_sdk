@@ -27,3 +27,12 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.10" apply false
 }
 include(":app")
+include(":runtime-aware-sdk")
+include(":inapp-mediatee-sdk-adapter")
+include(":mediatee-sdk")
+include(":mediatee-sdk-bundle")
+include(":mediatee-sdk-adapter-bundle")
+include(":runtime-enabled-sdk-bundle")
+include(":inapp-mediatee-sdk")
+include(":runtime-enabled-sdk")
+include(":mediatee-sdk-adapter")
