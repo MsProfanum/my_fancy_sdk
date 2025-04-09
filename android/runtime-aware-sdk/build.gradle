@@ -25,9 +25,7 @@ android {
         enable = true
     }
     defaultConfig {
-        compileSdk 34
-        compileSdkExtension 12
-        targetSdk 34
+        compileSdk 35
         minSdk 21
     }
     compileOptions {
@@ -37,6 +35,17 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+
+    experimentalProperties["android.privacySandboxSdk.apiGenerator.generatedRuntimeDependencies"] =
+            [
+                    project.dependencies.create('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10'),
+                    project.dependencies.create("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1"),
+                    project.dependencies.create("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"),
+                    project.dependencies.create('androidx.privacysandbox.ui:ui-core:1.0.0-alpha14'),
+                    project.dependencies.create('androidx.privacysandbox.ui:ui-client:1.0.0-alpha14'),
+                    project.dependencies.create('androidx.privacysandbox.activity:activity-core:1.0.0-alpha01'),
+                    project.dependencies.create('androidx.privacysandbox.activity:activity-client:1.0.0-alpha01'),
+            ]
 }
 
 dependencies {
@@ -46,8 +55,8 @@ dependencies {
     // Instead, the bundle contains information the SDK's API,
     // and the AGP Plugin used to generate sources and compile the app.
     debugImplementation project(':runtime-enabled-sdk-bundle')
-    debugImplementation project(':mediatee-sdk-adapter-bundle')
-    implementation project(':inapp-mediatee-sdk-adapter')
-    implementation libs.androidx.appcompat
+//    debugImplementation project(':mediatee-sdk-adapter-bundle')
+//    implementation project(':inapp-mediatee-sdk-adapter')
     implementation libs.bundles.sdkruntimeRASDK
+    implementation libs.androidx.appcompat
 }

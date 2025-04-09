@@ -22,7 +22,7 @@ import androidx.privacysandbox.sdkruntime.client.SdkSandboxManagerCompat
 import androidx.privacysandbox.sdkruntime.core.LoadSdkCompatException
 import com.runtimeenabled.api.SdkService
 import com.runtimeenabled.api.SdkServiceFactory
-import com.inappmediateeadapter.implementation.InAppMediateeSdkAdapter
+//import com.inappmediateeadapter.implementation.InAppMediateeSdkAdapter
 
 class ExistingSdk(private val context: Context) {
 
@@ -50,8 +50,7 @@ class ExistingSdk(private val context: Context) {
      * app anymore.
      */
     private fun registerInAppMediateeAdapter() {
-        val inAppMediateeSdkAdapter = InAppMediateeSdkAdapter(context)
-        remoteInstance?.registerInAppMediateeAdapter(inAppMediateeSdkAdapter)
+//        val inAppMediateeSdkAdapter = InAsiateeAdapter(inAppMediateeSdkAdapter)
     }
 
     /** Keeps a reference to a sandboxed SDK and makes sure it's only loaded once. */

@@ -7,6 +7,9 @@ plugins {
 
 android {
     namespace = "com.example.my_fancy_sdk_example"
+    privacySandbox {
+        enable = true
+    }
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -37,6 +40,12 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
+
+dependencies {
+    implementation(project(":runtime-aware-sdk"))
+    implementation(project(":runtime-enabled-sdk"))
+    implementation(project(":runtime-enabled-sdk-bundle"))
 }
 
 flutter {
