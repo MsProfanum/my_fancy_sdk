@@ -26,6 +26,7 @@ plugins {
     id("com.google.devtools.ksp") version "1.9.10-1.0.13" apply false
     id("org.jetbrains.kotlin.jvm") version "1.9.10" apply false
 }
+
 include(":app")
 include(":runtime-aware-sdk")
 project(":runtime-aware-sdk").projectDir = File("../../android/runtime-aware-sdk")

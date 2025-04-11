@@ -42,12 +42,6 @@ android {
     }
 }
 
-dependencies {
-    implementation(project(":runtime-aware-sdk"))
-    implementation(project(":runtime-enabled-sdk"))
-    implementation(project(":runtime-enabled-sdk-bundle"))
-}
-
 flutter {
     source = "../.."
 }
