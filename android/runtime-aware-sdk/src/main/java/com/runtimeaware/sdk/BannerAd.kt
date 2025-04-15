@@ -20,20 +20,20 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.privacysandbox.activity.client.createSdkActivityLauncher
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import com.runtimeenabled.api.SdkBannerRequest
+import androidx.fragment.app.FragmentActivity
 
-class BannerAd(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs) {
+class BannerAd(context: Context, attrs: AttributeSet? = null) : LinearLayout(context, attrs) {
 
     // This method could divert a percentage of requests to a sandboxed SDK and fallback to
     // existing ad logic. For this runtimeenabled, we send all requests to the sandboxed SDK as long as it
     // exists.
     suspend fun loadAd(
-        baseActivity: AppCompatActivity,
+        baseActivity: FragmentActivity,
         clientMessage: String,
         allowSdkActivityLaunch: () -> Boolean,
         shouldLoadWebView: Boolean,
@@ -58,7 +58,7 @@ class BannerAd(context: Context, attrs: AttributeSet) : LinearLayout(context, at
     }
 
     private suspend fun getBannerAdFromRuntimeEnabledSdkIfExists(
-        baseActivity: AppCompatActivity,
+        baseActivity: FragmentActivity,
         message: String,
         allowSdkActivityLaunch: () -> Boolean,
         shouldLoadWebView: Boolean,
