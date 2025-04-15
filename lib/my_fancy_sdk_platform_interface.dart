@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'my_fancy_sdk_method_channel.dart';
@@ -23,7 +24,19 @@ abstract class MyFancySdkPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+  Future<Widget> initializeSdk() {
+    throw UnimplementedError('initializeSdk() has not been implemented.');
+  }
+
+  Future<Widget> createFile() {
+    throw UnimplementedError('createFile() has not been implemented.');
+  }
+
+  Future<Widget> loadBannerAd() {
+    throw UnimplementedError('loadBannerAd() has not been implemented.');
+  }
+
+  Future<void> showFullscreenAd() {
+    throw UnimplementedError('loadBannerAd() has not been implemented.');
   }
 }

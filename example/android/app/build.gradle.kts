@@ -10,6 +10,14 @@ android {
     privacySandbox {
         enable = true
     }
+//    buildFeatures {
+//        compose = true
+//    }
+//
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = "1.7.8"
+//    }
+
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -39,6 +47,12 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+
+    dependencies {
+        implementation("androidx.compose.ui:ui:1.7.8")
+        implementation("androidx.compose.foundation:foundation:1.7.8")
+        implementation("androidx.compose.material:material:1.7.8")
     }
 }
 

@@ -27,6 +27,14 @@ apply plugin: "kotlin-android"
 android {
     namespace = "com.example.my_fancy_sdk"
 
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
+    }
+
     compileSdk = 35
 
     compileOptions {
