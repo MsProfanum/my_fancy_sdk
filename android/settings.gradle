@@ -1,26 +1,27 @@
-pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    plugins {
-        id("org.jetbrains.kotlin.android") version "1.9.10"
-    }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+//pluginManagement {
+//    repositories {
+//        google()
+//        mavenCentral()
+//        gradlePluginPortal()
+//    }
+//    plugins {
+//        id("org.jetbrains.kotlin.android") version "1.9.10"
+//    }
+//}
+//dependencyResolutionManagement {
+//    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+//    repositories {
+//        google()
+//        mavenCentral()
+//    }
+//}
 
 rootProject.name = 'my_fancy_sdk'
 
-include ':runtime-aware-sdk'
-project(':runtime-aware-sdk').projectDir = file(settingsDir, "runtime-aware-sdk")
-include ':runtime-enabled-sdk'
-project(':runtime-enabled-sdk').projectDir = file(settingsDir, "runtime-enabled-sdk")
-include ':runtime-enabled-sdk-bundle'
-project(':runtime-enabled-sdk-bundle').projectDir = file(settingsDir, "runtime-enabled-sdk-bundle")
+/// Not needed now - the dependencies come from th example/android/settings.gradle.kts file
+//include ':runtime-aware-sdk'
+//project(':runtime-aware-sdk').projectDir = file(settingsDir, "runtime-aware-sdk")
+//include ':runtime-enabled-sdk'
+//project(':runtime-enabled-sdk').projectDir = file(settingsDir, "runtime-enabled-sdk")
+//include ':runtime-enabled-sdk-bundle'
+//project(':runtime-enabled-sdk-bundle').projectDir = file(settingsDir, "runtime-enabled-sdk-bundle")
