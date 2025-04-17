@@ -17,6 +17,7 @@ package com.runtimeaware.sdk
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -62,15 +63,14 @@ class BannerAd(context: Context, attrs: AttributeSet? = null) : LinearLayout(con
         message: String,
         allowSdkActivityLaunch: () -> Boolean,
         shouldLoadWebView: Boolean,
-        mediationType: String
+        mediationType: String,
     ): SandboxedUiAdapter? {
         if (!ExistingSdk.isSdkLoaded()) {
             return null
         }
-
         val launcher = baseActivity.createSdkActivityLauncher(allowSdkActivityLaunch)
         val request = SdkBannerRequest(message, launcher, shouldLoadWebView)
-        // Get the SandboxedUiAdapter from the Bundle.
+
         return SandboxedUiAdapterFactory.createFromCoreLibInfo(
             checkNotNull(
                 ExistingSdk.loadSdkIfNeeded(

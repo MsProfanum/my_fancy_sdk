@@ -108,10 +108,10 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin, MethodCallHan
         }
 
         "showFullscreenAd" -> {
-          lifecycleScope.launch {
-            val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
-            fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
-          }
+//          lifecycleScope.launch {
+//            val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
+//            fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
+//          }
         }
 
         else -> result.notImplemented()
@@ -184,10 +184,10 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin, MethodCallHan
       }
 
       "showFullscreenAd" -> {
-        lifecycleScope.launch {
-          val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
-          fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
-        }
+//        lifecycleScope.launch {
+//          val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
+//          fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
+//        }
       }
 
       else -> result.notImplemented()
@@ -258,10 +258,10 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin, MethodCallHan
         }
 
         "showFullscreenAd" -> {
-          lifecycleScope.launch {
-            val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
-            fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
-          }
+//          lifecycleScope.launch {
+//            val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
+//            fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
+//          }
         }
 
         else -> result.notImplemented()

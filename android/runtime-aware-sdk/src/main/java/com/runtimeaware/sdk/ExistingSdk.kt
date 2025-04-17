@@ -34,23 +34,12 @@ class ExistingSdk(private val context: Context) {
         // You can also have a fallback mechanism here, where if the SDK cannot be loaded in the SDK
         // runtime, initialize as you usually would.
         val isMediatorSdkLoaded = loadSdkIfNeeded(context) != null
-        if (isMediatorSdkLoaded) registerInAppMediateeAdapter()
         return isMediatorSdkLoaded
     }
 
     suspend fun createFile(size: Int): String? {
         if (!isSdkLoaded()) return null
         return loadSdkIfNeeded(context)?.createFile(size)
-    }
-
-    /**
-     * In-App mediatee is initialised and registered from the App after Sdk is loaded.
-     *
-     * Once In-App mediatee transitions to run in Runtime process, this will not be done by the
-     * app anymore.
-     */
-    private fun registerInAppMediateeAdapter() {
-//        val inAppMediateeSdkAdapter = InAsiateeAdapter(inAppMediateeSdkAdapter)
     }
 
     /** Keeps a reference to a sandboxed SDK and makes sure it's only loaded once. */
