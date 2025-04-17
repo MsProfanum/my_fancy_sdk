@@ -35,12 +35,12 @@ import kotlin.random.Random
 
 // Have to use the FlutterFragmentActivity instead of FlutterActivity
 // because we only want to show the view on the part of the screen.
-class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin, MethodCallHandler {
+class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
   val viewsId = AtomicInteger(0)
   val composeViews = mutableMapOf<Int, ComposeView>()
   val linearLayouts = mutableMapOf<Int, LinearLayout>()
-  private var runtimeAwareSdk = ExistingSdk(this)
 
+  private lateinit var runtimeAwareSdk: ExistingSdk
   private lateinit var methodChannel: MethodChannel
   private lateinit var bannerAd: BannerAd
 
@@ -50,6 +50,7 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin, MethodCallHan
     methodChannel = MethodChannel(
       binding.getBinaryMessenger(), CHANNEL,
     )
+    runtimeAwareSdk = ExistingSdk(binding.applicationContext)
     methodChannel.setMethodCallHandler { call, result ->
       when (call.method) {
         "initializeSdk" -> {
@@ -60,7 +61,6 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin, MethodCallHan
             } else {
               result.success("Initialized SDK!")
             }
-
           }
         }
 
@@ -89,9 +89,9 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin, MethodCallHan
           val attr: AttributeSet? = null
 
           lifecycleScope.launch {
-            bannerAd = BannerAd(this@MyFancySdkPlugin)
+            bannerAd = BannerAd(binding.applicationContext)
 
-            var linearLayout = createLinearLayout(this@MyFancySdkPlugin)
+            var linearLayout = createLinearLayout(binding.applicationContext)
             linearLayouts[linearLayout.id] = linearLayout
             linearLayout.addView(bannerAd)
 
@@ -121,77 +121,6 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin, MethodCallHan
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     methodChannel.setMethodCallHandler(null)
-  }
-
-  override fun onMethodCall(
-    call: MethodCall,
-    result: MethodChannel.Result,
-  ) {
-    when (call.method) {
-      "initializeSdk" -> {
-
-        lifecycleScope.launch {
-          if (!runtimeAwareSdk.initialize()) {
-            result.success("Failed to initialize SDK")
-          } else {
-            result.success("Initialized SDK!")
-          }
-
-        }
-      }
-
-      "createFile" -> {
-
-        lifecycleScope.launch {
-          val success = runtimeAwareSdk.createFile(3)
-
-          if (success == null) {
-            result.success("Please load the SDK first!")
-          } else {
-            result.success(success)
-          }
-
-        }
-      }
-
-      "getRandomNumber" -> {
-        val composeView = getRandomNumber()
-        composeViews[composeView.id] = composeView
-        result.success(composeView.id)
-      }
-
-      "loadBannerAd" -> {
-
-        val attr: AttributeSet? = null
-
-        lifecycleScope.launch {
-          bannerAd = BannerAd(this@MyFancySdkPlugin)
-
-          var linearLayout = createLinearLayout(this@MyFancySdkPlugin)
-          linearLayouts[linearLayout.id] = linearLayout
-          linearLayout.addView(bannerAd)
-
-          bannerAd.loadAd(
-            this@MyFancySdkPlugin,
-            PACKAGE_NAME,
-            shouldStartActivityPredicate(),
-            false,
-            "NONE"
-          )
-
-          result.success(linearLayout.id)
-        }
-      }
-
-      "showFullscreenAd" -> {
-//        lifecycleScope.launch {
-//          val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
-//          fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
-//        }
-      }
-
-      else -> result.notImplemented()
-    }
   }
 
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {

@@ -17,7 +17,6 @@ package com.runtimeaware.sdk
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import com.runtimeenabled.api.FullscreenAd
 import androidx.privacysandbox.activity.client.createSdkActivityLauncher
