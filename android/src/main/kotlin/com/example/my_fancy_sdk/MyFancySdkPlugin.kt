@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger
 // Have to use the FlutterFragmentActivity instead of FlutterActivity
 // because we only want to show the view on the part of the screen.
 class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
-  val viewsId = AtomicInteger(0)
   val composeViews = mutableMapOf<Int, ComposeView>()
   val linearLayouts = mutableMapOf<Int, LinearLayout>()
   private lateinit var methodChannel: MethodChannel
@@ -41,11 +40,9 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
       binding.getBinaryMessenger(), CHANNEL,
     )
     val runtimeAwareSdk = ExistingSdk(binding.applicationContext)
-    val linearLayout = createLinearLayout(binding.applicationContext)
 
     val methodChannelHandler = MyFancySdkMethodChannelHandler(
       runtimeAwareSdk,
-      linearLayout,
       binding.applicationContext,
       this@MyFancySdkPlugin,
       linearLayouts,
@@ -69,25 +66,6 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
     )
   }
 
-  private fun createLinearLayout(context: Context): LinearLayout {
-    val linearLayout = LinearLayout(context)
-
-    // Set layout orientation (e.g., vertical or horizontal)
-    linearLayout.orientation = LinearLayout.VERTICAL // Or LinearLayout.HORIZONTAL
-
-    // Set layout width and height
-    linearLayout.layoutParams = LinearLayout.LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.MATCH_PARENT
-    )
-
-    //  Optional: Add some styling (example)
-    linearLayout.setBackgroundColor(android.graphics.Color.GREEN)
-    linearLayout.setPadding(16, 16, 16, 16) // Example padding
-    linearLayout.id = viewsId.incrementAndGet()
-
-    return linearLayout
-  }
   companion object {
     private const val CHANNEL = "my_fancy_sdk"
   }

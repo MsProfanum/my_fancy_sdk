@@ -34,6 +34,7 @@ class ExistingSdk(private val context: Context) {
         // You can also have a fallback mechanism here, where if the SDK cannot be loaded in the SDK
         // runtime, initialize as you usually would.
         val isMediatorSdkLoaded = loadSdkIfNeeded(context) != null
+        if (isMediatorSdkLoaded) registerInAppMediateeAdapter()
         return isMediatorSdkLoaded
     }
 
@@ -64,7 +65,7 @@ class ExistingSdk(private val context: Context) {
         suspend fun loadSdkIfNeeded(context: Context): SdkService? {
             try {
                 // First we need to check if the SDK is already loaded. If it is we just return it.
-                // The sandbox manager will throw an exception if we try to load an SDK that is
+                // The  sandbox manager will throw an exception if we try to load an SDK that is
                 // already loaded.
                 if (remoteInstance != null) return remoteInstance
 
@@ -73,8 +74,7 @@ class ExistingSdk(private val context: Context) {
 
                 val sandboxedSdk = sandboxManagerCompat.loadSdk(SDK_NAME, Bundle.EMPTY)
                 remoteInstance = SdkServiceFactory.wrapToSdkService(sandboxedSdk.getInterface()!!)
-                // Initialise Adapters and Mediatees.
-                remoteInstance?.initialise()
+                Log.d("ExistingSDK", "Remote instance after: $remoteInstance")
                 return remoteInstance
             } catch (e: LoadSdkCompatException) {
                 Log.e(TAG, "Failed to load SDK, error code: ${e.loadSdkErrorCode}", e)

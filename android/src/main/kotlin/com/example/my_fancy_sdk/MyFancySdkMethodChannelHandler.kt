@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.compose.ui.platform.ComposeView
@@ -27,14 +28,14 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class MyFancySdkMethodChannelHandler (
     val runtimeAwareSdk: ExistingSdk,
-    val linearLayout: LinearLayout,
     val context: Context,
     val activity: FragmentActivity,
     val linearLayouts: MutableMap<Int, LinearLayout>,
     ) :
     MethodCallHandler {
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+    val viewsId = AtomicInteger(0)
 
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "initializeSdk" -> {
                 activity.lifecycleScope.launch {
@@ -64,11 +65,11 @@ class MyFancySdkMethodChannelHandler (
             }
 
             "loadBannerAd" -> {
-                val attr: AttributeSet? = null
-                val bannerAd = BannerAd(context)
-
                 activity.lifecycleScope.launch {
                     try {
+                        val bannerAd = BannerAd(context)
+
+                        var linearLayout = createLinearLayout(context)
                         linearLayouts[linearLayout.id] = linearLayout
                         linearLayout.addView(bannerAd)
 
@@ -102,7 +103,25 @@ class MyFancySdkMethodChannelHandler (
         }
     }
 
+    private fun createLinearLayout(context: Context): LinearLayout {
+        val linearLayout = LinearLayout(context)
 
+        // Set layout orientation (e.g., vertical or horizontal)
+        linearLayout.orientation = LinearLayout.VERTICAL // Or LinearLayout.HORIZONTAL
+
+        // Set layout width and height
+        linearLayout.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        //  Optional: Add some styling (example)
+        linearLayout.setBackgroundColor(android.graphics.Color.GREEN)
+        linearLayout.setPadding(16, 16, 16, 16) // Example padding
+        linearLayout.id = viewsId.incrementAndGet()
+
+        return linearLayout
+    }
 
     private fun shouldStartActivityPredicate(): () -> Boolean {
         return { true }

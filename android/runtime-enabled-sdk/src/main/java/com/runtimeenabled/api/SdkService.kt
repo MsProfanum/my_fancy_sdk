@@ -37,7 +37,7 @@ interface SdkService {
      * this will need to be returned in a Bundle (one SDK cannot use a shim object defined by
      * another SDK), return type for getBanner will always be a Bundle.
      */
-    suspend fun getBanner(request: SdkBannerRequest, mediationType: String): Bundle?
+    suspend fun getBanner(request: SdkBannerRequest): SdkSandboxedUiAdapter
 
     suspend fun getFullscreenAd(mediationType: String): FullscreenAd
 

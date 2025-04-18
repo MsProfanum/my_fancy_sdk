@@ -17,6 +17,7 @@ package com.runtimeaware.sdk
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -28,7 +29,6 @@ import com.runtimeenabled.api.SdkBannerRequest
 import androidx.fragment.app.FragmentActivity
 
 class BannerAd(context: Context, attrs: AttributeSet? = null) : LinearLayout(context, attrs) {
-
     // This method could divert a percentage of requests to a sandboxed SDK and fallback to
     // existing ad logic. For this runtimeenabled, we send all requests to the sandboxed SDK as long as it
     // exists.
@@ -37,7 +37,8 @@ class BannerAd(context: Context, attrs: AttributeSet? = null) : LinearLayout(con
         clientMessage: String,
         allowSdkActivityLaunch: () -> Boolean,
         shouldLoadWebView: Boolean,
-        mediationType: String) {
+        mediationType: String,
+    ) {
         val bannerAd = getBannerAdFromRuntimeEnabledSdkIfExists(
             baseActivity,
             clientMessage,
@@ -49,6 +50,8 @@ class BannerAd(context: Context, attrs: AttributeSet? = null) : LinearLayout(con
             val sandboxedSdkView = SandboxedSdkView(context)
             addViewToLayout(sandboxedSdkView)
             sandboxedSdkView.setAdapter(bannerAd)
+
+
             return
         }
 
@@ -65,17 +68,13 @@ class BannerAd(context: Context, attrs: AttributeSet? = null) : LinearLayout(con
         mediationType: String,
     ): SandboxedUiAdapter? {
         if (!ExistingSdk.isSdkLoaded()) {
+            Log.d("BannerAd", "Sdk is not loaded")
             return null
         }
         val launcher = baseActivity.createSdkActivityLauncher(allowSdkActivityLaunch)
         val request = SdkBannerRequest(message, launcher, shouldLoadWebView)
-
-        return SandboxedUiAdapterFactory.createFromCoreLibInfo(
-            checkNotNull(
-                ExistingSdk.loadSdkIfNeeded(
-                    context
-                )?.getBanner(request, mediationType)
-            ) { "No banner Ad received from ad SDK!" })
+        Log.d("BannerAd", "Sdk is loaded")
+        return ExistingSdk.loadSdkIfNeeded(context)?.getBanner(request)
     }
 
     private fun addViewToLayout(view: View) {
