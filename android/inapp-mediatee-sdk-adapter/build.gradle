@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The Android Open Source Project
+ * Copyright (C) 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,27 @@
  */
 
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
+    id "androidx.privacysandbox.library"
+    id "org.jetbrains.kotlin.android"
 }
 
 android {
-    namespace 'com.runtimeaware.sdk'
-    privacySandbox {
-        enable = true
-    }
+    namespace "com.inappmediateeadapter"
+
     defaultConfig {
-        compileSdk 35
         minSdk 21
+        compileSdk 35
+        targetSdk 34
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -35,17 +44,6 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
-
-//    experimentalProperties["android.privacySandboxSdk.apiGenerator.generatedRuntimeDependencies"] =
-//            [
-//                    project.dependencies.create('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10'),
-//                    project.dependencies.create("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1"),
-//                    project.dependencies.create("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"),
-//                    project.dependencies.create('androidx.privacysandbox.ui:ui-core:1.0.0-alpha14'),
-//                    project.dependencies.create('androidx.privacysandbox.ui:ui-client:1.0.0-alpha14'),
-//                    project.dependencies.create('androidx.privacysandbox.activity:activity-core:1.0.0-alpha01'),
-//                    project.dependencies.create('androidx.privacysandbox.activity:activity-client:1.0.0-alpha01'),
-//            ]
 }
 
 dependencies {
@@ -55,8 +53,14 @@ dependencies {
     // Instead, the bundle contains information the SDK's API,
     // and the AGP Plugin used to generate sources and compile the app.
     debugImplementation project(':runtime-enabled-sdk-bundle')
-    debugImplementation project(':mediatee-sdk-adapter-bundle')
-    implementation project(':inapp-mediatee-sdk-adapter')
-    implementation libs.bundles.sdkruntimeRASDK
+    implementation project(':inapp-mediatee-sdk')
+
+    implementation libs.androidx.activity.ktx
     implementation libs.androidx.appcompat
+    implementation libs.kotlin.stdlib.jdk8
+    implementation libs.androidx.lifecycle.common
+    implementation libs.bundles.coroutines
+
+    // As an adapter for an in-app mediatee, this library needs to behave as an RE SDK
+    implementation libs.bundles.sdkruntimeRESDK
 }

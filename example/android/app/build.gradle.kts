@@ -50,6 +50,8 @@ android {
     }
 
     dependencies {
+        implementation(project(":runtime-aware-sdk"))
+        implementation(project(":mediatee-sdk-adapter-bundle"))
         implementation("androidx.compose.ui:ui:1.7.8")
         implementation("androidx.compose.foundation:foundation:1.7.8")
         implementation("androidx.compose.material:material:1.7.8")

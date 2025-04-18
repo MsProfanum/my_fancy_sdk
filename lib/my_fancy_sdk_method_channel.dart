@@ -19,7 +19,7 @@ class MethodChannelMyFancySdk extends MyFancySdkPlatform {
     try {
       result = await methodChannel.invokeMethod("initializeSdk");
     } on PlatformException catch (e) {
-      print('Failed to initialize SDK: ${e.message}');
+      return Text('Failed to initialize SDK: ${e.message}');
     }
 
     return Text(result);
@@ -72,6 +72,7 @@ class MethodChannelMyFancySdk extends MyFancySdkPlatform {
       );
     } on PlatformException catch (e) {
       print('Failed to load a banner ad: ${e.message}');
+      return Text(e.message.toString());
     }
 
     return loadBannerWidget;

@@ -2,7 +2,7 @@ package com.example.my_fancy_sdk
 
 import android.app.Activity
 import android.content.Context
-import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.runtimeaware.sdk.BannerAd
 import com.runtimeaware.sdk.FullscreenAd
 import com.runtimeaware.sdk.ExistingSdk
@@ -27,11 +26,7 @@ import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.random.Random
 
 // Have to use the FlutterFragmentActivity instead of FlutterActivity
 // because we only want to show the view on the part of the screen.
@@ -39,84 +34,23 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
   val viewsId = AtomicInteger(0)
   val composeViews = mutableMapOf<Int, ComposeView>()
   val linearLayouts = mutableMapOf<Int, LinearLayout>()
-
-  private lateinit var runtimeAwareSdk: ExistingSdk
   private lateinit var methodChannel: MethodChannel
-  private lateinit var bannerAd: BannerAd
-
-
 
   override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     methodChannel = MethodChannel(
       binding.getBinaryMessenger(), CHANNEL,
     )
-    runtimeAwareSdk = ExistingSdk(binding.applicationContext)
-    methodChannel.setMethodCallHandler { call, result ->
-      when (call.method) {
-        "initializeSdk" -> {
+    val runtimeAwareSdk = ExistingSdk(binding.applicationContext)
+    val linearLayout = createLinearLayout(binding.applicationContext)
 
-          lifecycleScope.launch {
-            if (!runtimeAwareSdk.initialize()) {
-              result.success("Failed to initialize SDK")
-            } else {
-              result.success("Initialized SDK!")
-            }
-          }
-        }
-
-        "createFile" -> {
-
-          lifecycleScope.launch {
-            val success = runtimeAwareSdk.createFile(3)
-
-            if (success == null) {
-              result.success("Please load the SDK first!")
-            } else {
-              result.success(success)
-            }
-
-          }
-        }
-
-        "getRandomNumber" -> {
-          val composeView = getRandomNumber()
-          composeViews[composeView.id] = composeView
-          result.success(composeView.id)
-        }
-
-        "loadBannerAd" -> {
-
-          val attr: AttributeSet? = null
-
-          lifecycleScope.launch {
-            bannerAd = BannerAd(binding.applicationContext)
-
-            var linearLayout = createLinearLayout(binding.applicationContext)
-            linearLayouts[linearLayout.id] = linearLayout
-            linearLayout.addView(bannerAd)
-
-            bannerAd.loadAd(
-              this@MyFancySdkPlugin,
-              PACKAGE_NAME,
-              shouldStartActivityPredicate(),
-              false,
-              "NONE"
-            )
-
-            result.success(linearLayout.id)
-          }
-        }
-
-        "showFullscreenAd" -> {
-//          lifecycleScope.launch {
-//            val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
-//            fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
-//          }
-        }
-
-        else -> result.notImplemented()
-      }
-    }
+    val methodChannelHandler = MyFancySdkMethodChannelHandler(
+      runtimeAwareSdk,
+      linearLayout,
+      binding.applicationContext,
+      this@MyFancySdkPlugin,
+      linearLayouts,
+      )
+    methodChannel.setMethodCallHandler(methodChannelHandler)
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -126,77 +60,6 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
 
-    MethodChannel(
-      flutterEngine.dartExecutor.binaryMessenger,
-      CHANNEL
-    ).setMethodCallHandler { call, result ->
-      when (call.method) {
-        "initializeSdk" -> {
-
-          lifecycleScope.launch {
-            if (!runtimeAwareSdk.initialize()) {
-              result.success("Failed to initialize SDK")
-            } else {
-              result.success("Initialized SDK!")
-            }
-
-          }
-        }
-
-        "createFile" -> {
-
-          lifecycleScope.launch {
-            val success = runtimeAwareSdk.createFile(3)
-
-            if (success == null) {
-              result.success("Please load the SDK first!")
-            } else {
-              result.success(success)
-            }
-
-          }
-        }
-
-        "getRandomNumber" -> {
-          val composeView = getRandomNumber()
-          composeViews[composeView.id] = composeView
-          result.success(composeView.id)
-        }
-
-        "loadBannerAd" -> {
-
-          val attr: AttributeSet? = null
-
-          lifecycleScope.launch {
-            bannerAd = BannerAd(this@MyFancySdkPlugin)
-
-            var linearLayout = createLinearLayout(this@MyFancySdkPlugin)
-            linearLayouts[linearLayout.id] = linearLayout
-            linearLayout.addView(bannerAd)
-
-            bannerAd.loadAd(
-              this@MyFancySdkPlugin,
-              PACKAGE_NAME,
-              shouldStartActivityPredicate(),
-              false,
-              "NONE"
-            )
-
-            result.success(linearLayout.id)
-          }
-        }
-
-        "showFullscreenAd" -> {
-//          lifecycleScope.launch {
-//            val fullscreenAd = FullscreenAd.create(this@MyFancySdkPlugin, "NONE")
-//            fullscreenAd.show(this@MyFancySdkPlugin, shouldStartActivityPredicate())
-//          }
-        }
-
-        else -> result.notImplemented()
-      }
-    }
-
     flutterEngine.platformViewsController.registry.registerViewFactory(
       "compose-view",
       ComposeViewFactory(this)
@@ -204,10 +67,6 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
     flutterEngine.platformViewsController.registry.registerViewFactory(
       "linear-layout-view", LinearLayoutViewFactory(this)
     )
-  }
-
-  private fun shouldStartActivityPredicate(): () -> Boolean {
-    return { true }
   }
 
   private fun createLinearLayout(context: Context): LinearLayout {
@@ -229,32 +88,10 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
 
     return linearLayout
   }
-
-
-  private fun getRandomNumber(): ComposeView {
-    val randomNumber = Random.nextInt(0, 100)
-    val viewId = viewsId.incrementAndGet()
-    return ComposeView(this).apply {
-      id = viewId // Set the view
-      setContent {
-        Box(
-          modifier = Modifier
-            .size(200.dp)
-            .background(Color.Red),
-          contentAlignment = Alignment.Center
-        ) {
-          Text(text = "Random Number: $randomNumber")
-        }
-      }
-    }
-  }
-
   companion object {
     private const val CHANNEL = "my_fancy_sdk"
-    private const val PACKAGE_NAME = "com.example.my_fancy_sdk"
   }
 }
-
 
 class ComposeViewFactory(private val activity: MyFancySdkPlugin) :
   PlatformViewFactory(StandardMessageCodec.INSTANCE) {
