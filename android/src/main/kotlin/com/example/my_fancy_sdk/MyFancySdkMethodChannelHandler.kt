@@ -8,22 +8,26 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import kotlinx.coroutines.launch
 import android.util.AttributeSet
+import android.widget.TextView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.example.my_fancy_sdk.MyFancySdkPlugin
 import com.runtimeaware.sdk.BannerAd
 import com.runtimeaware.sdk.FullscreenAd
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.*
 
 
 class MyFancySdkMethodChannelHandler (
@@ -33,12 +37,16 @@ class MyFancySdkMethodChannelHandler (
     val linearLayouts: MutableMap<Int, LinearLayout>,
     ) :
     MethodCallHandler {
+        val scope = CoroutineScope(Dispatchers.Main)
     val viewsId = AtomicInteger(0)
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        Log.d("MyFancySdk", "activity $activity")
+
         when (call.method) {
             "initializeSdk" -> {
-                activity.lifecycleScope.launch {
+                Log.d("MyFancySdk", "before initializeSdk")
+                scope.launch {
                     try {
                         if (!runtimeAwareSdk.initialize()) {
                             result.success("Failed to initialize SDK")
@@ -52,7 +60,7 @@ class MyFancySdkMethodChannelHandler (
             }
 
             "createFile" -> {
-                activity.lifecycleScope.launch {
+                scope.launch {
                     val success = runtimeAwareSdk.createFile(3)
 
                     if (success == null) {
@@ -65,7 +73,7 @@ class MyFancySdkMethodChannelHandler (
             }
 
             "loadBannerAd" -> {
-                activity.lifecycleScope.launch {
+                scope.launch {
                     try {
                         val bannerAd = BannerAd(context)
 
@@ -89,7 +97,7 @@ class MyFancySdkMethodChannelHandler (
             }
 
             "showFullscreenAd" -> {
-                activity.lifecycleScope.launch {
+                scope.launch {
                     try {
                         val fullscreenAd = FullscreenAd.create(context, "NONE")
                         fullscreenAd.show(activity, shouldStartActivityPredicate())

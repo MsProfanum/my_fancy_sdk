@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
+import com.example.my_fancy_sdk.ComposeViewFactory
 import com.runtimeaware.sdk.BannerAd
 import com.runtimeaware.sdk.FullscreenAd
 import com.runtimeaware.sdk.ExistingSdk
@@ -26,44 +28,78 @@ import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import java.util.concurrent.atomic.AtomicInteger
 
 // Have to use the FlutterFragmentActivity instead of FlutterActivity
 // because we only want to show the view on the part of the screen.
-class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
+class MyFancySdkPlugin : FlutterPlugin, ActivityAware {
   val composeViews = mutableMapOf<Int, ComposeView>()
   val linearLayouts = mutableMapOf<Int, LinearLayout>()
   private lateinit var methodChannel: MethodChannel
+  private lateinit var runtimeAwareSdk: ExistingSdk
+  private var activity: FlutterFragmentActivity? = null
+  private lateinit var context: Context
 
   override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    methodChannel = MethodChannel(
-      binding.getBinaryMessenger(), CHANNEL,
-    )
-    val runtimeAwareSdk = ExistingSdk(binding.applicationContext)
+    Log.d("MyFancyPluginSdk", "onAttachedToEngine")
 
-    val methodChannelHandler = MyFancySdkMethodChannelHandler(
-      runtimeAwareSdk,
-      binding.applicationContext,
-      this@MyFancySdkPlugin,
-      linearLayouts,
-      )
-    methodChannel.setMethodCallHandler(methodChannelHandler)
+    runtimeAwareSdk = ExistingSdk(binding.applicationContext)
+
+    binding.platformViewRegistry.registerViewFactory(
+      "compose-view",
+      ComposeViewFactory(composeViews)
+    )
+    binding.platformViewRegistry.registerViewFactory(
+      "linear-layout-view", LinearLayoutViewFactory(linearLayouts)
+    )
+
+    methodChannel = MethodChannel(
+      binding.binaryMessenger, CHANNEL,
+    )
+    context = binding.applicationContext
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    Log.d("MyFancyPluginSdk", "onDetachedFromEngine")
     methodChannel.setMethodCallHandler(null)
+    activity = null
   }
 
-  override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-    super.configureFlutterEngine(flutterEngine)
+  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    Log.d("MyFancyPluginSdk", "onAttachedToActivity, Activity Class: ${binding.activity.javaClass.name}")
+    activity = binding.activity as? FlutterFragmentActivity
+    if (activity == null) {
+      Log.e("MyFancyPluginSdk", "Error: Could not cast activity to AppCompatActivity")
+      // Optionally, you could try to defer handler creation or signal an error
+      return
+    } else {
+      Log.d("MyFancyPluginSdk", "Activity is AppCompatActivity")
+    }
 
-    flutterEngine.platformViewsController.registry.registerViewFactory(
-      "compose-view",
-      ComposeViewFactory(this)
+    val methodChannelHandler = MyFancySdkMethodChannelHandler(
+      runtimeAwareSdk,
+      context,
+      activity!!,
+      linearLayouts,
     )
-    flutterEngine.platformViewsController.registry.registerViewFactory(
-      "linear-layout-view", LinearLayoutViewFactory(this)
-    )
+    methodChannel.setMethodCallHandler(methodChannelHandler)
+  }
+
+  override fun onDetachedFromActivityForConfigChanges() {
+    Log.d("MyFancyPluginSdk", "onDetachedFromActivityForConfigChanges")
+    activity = null
+  }
+
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    activity = binding.activity as? FlutterFragmentActivity
+    Log.d("MyFancyPluginSdk", "Warning: Re-attached activity is not an AppCompatActivity")
+  }
+
+  override fun onDetachedFromActivity() {
+    Log.d("MyFancyPluginSdk", "onDetachedFromActivity")
+    activity = null
   }
 
   companion object {
@@ -71,11 +107,11 @@ class MyFancySdkPlugin : FlutterFragmentActivity(), FlutterPlugin {
   }
 }
 
-class ComposeViewFactory(private val activity: MyFancySdkPlugin) :
+class ComposeViewFactory(private val composeViews: Map<Int, ComposeView>) :
   PlatformViewFactory(StandardMessageCodec.INSTANCE) {
   override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
     val id = (args as Map<String, Any?>)["id"] as Int
-    val composeView = activity.composeViews[id]
+    val composeView = composeViews[id]
       ?: throw IllegalArgumentException("No ComposeView found with id: $id")
 
     return ComposeViewAndroid(composeView)
@@ -90,11 +126,11 @@ class ComposeViewAndroid(private val composeView: ComposeView) : PlatformView {
 }
 
 
-class LinearLayoutViewFactory(private val activity: MyFancySdkPlugin) :
+class LinearLayoutViewFactory(private val linearLayouts: Map<Int, LinearLayout>) :
   PlatformViewFactory(StandardMessageCodec.INSTANCE) {
   override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
     val id = (args as Map<String, Any?>)["id"] as Int
-    val linearLayout = activity.linearLayouts[id]
+    val linearLayout = linearLayouts[id]
       ?: throw IllegalArgumentException("No LinearLayout found with id: $id")
     return LinearLayoutViewAndroid(linearLayout)
   }
